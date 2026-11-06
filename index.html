@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Puzzle 53 — Google Places community node demo</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; background: #0b0d10; color: #e8eaed; }
+  h1 { font-size: 1.3rem; }
+  form { display: flex; gap: 8px; margin: 16px 0; }
+  input { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #16181c; color: #fff; }
+  button { padding: 10px 16px; border-radius: 6px; border: none; background: #4a7dfc; color: #fff; cursor: pointer; }
+  .card { border: 1px solid #262a30; border-radius: 8px; padding: 12px; margin: 10px 0; background: #121418; }
+  .card h3 { margin: 0 0 4px; }
+  .meta { color: #9aa0a6; font-size: 0.9rem; }
+  #status { color: #9aa0a6; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+  <h1>Puzzle #53 — n8n community node: Google Places API (Text Search)</h1>
+  <p class="meta">Same request/response contract as <code>@cryptodevops/n8n-nodes-google-places</code>'s
+  "Text Search" operation. Backend swaps Google's Places endpoint for SerpAPI's
+  <code>engine=google_maps</code> (no Google Places API key on this machine — same
+  substitute used for puzzle #34).</p>
+  <form id="f">
+    <input id="q" placeholder="e.g. coffee shops in Beirut" value="coffee shops in Beirut">
+    <button type="submit">Search</button>
+  </form>
+  <div id="status"></div>
+  <div id="results"></div>
+<script>
+const f = document.getElementById('f');
+const results = document.getElementById('results');
+const status = document.getElementById('status');
+f.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const q = document.getElementById('q').value.trim();
+  if (!q) return;
+  results.textContent = '';
+  status.textContent = 'Searching…';
+  try {
+    const res = await fetch('/api/places?q=' + encodeURIComponent(q));
+    const data = await res.json();
+    if (!res.ok) { status.textContent = 'Error: ' + (data.error || res.status); return; }
+    status.textContent = `${data.total_results} result(s) for "${data.query}"`;
+    results.replaceChildren();
+    for (const p of data.places) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      const h3 = document.createElement('h3');
+      h3.textContent = p.name || '(no name)';
+      const addr = document.createElement('div');
+      addr.className = 'meta';
+      addr.textContent = p.address || '';
+      const rating = document.createElement('div');
+      rating.className = 'meta';
+      rating.textContent = p.rating ? `Rating: ${p.rating}` : '';
+      card.append(h3, addr, rating);
+      results.appendChild(card);
+    }
+  } catch (err) {
+    status.textContent = 'Error: ' + err.message;
+  }
+});
+</script>
+</body>
+</html>

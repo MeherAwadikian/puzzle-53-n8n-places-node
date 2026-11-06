@@ -1,0 +1,75 @@
+{
+  "name": "Puzzle 53 - Google Places Community Node",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a1b2c3d4-0001-4aaa-bbbb-000000000001",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "resource": "place",
+        "operation": "textSearch",
+        "query": "coffee shops in Beirut",
+        "additionalFields": {
+          "maxResults": 10,
+          "aiMode": true,
+          "includeSummary": true
+        }
+      },
+      "id": "a1b2c3d4-0002-4aaa-bbbb-000000000002",
+      "name": "Google Places",
+      "type": "@cryptodevops/n8n-nodes-google-places.googlePlaces",
+      "typeVersion": 1,
+      "position": [460, 300],
+      "credentials": {
+        "googlePlacesApi": {
+          "id": "1",
+          "name": "Google Places API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0003-4aaa-bbbb-000000000003",
+      "name": "Respond",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [680, 300]
+    }
+  ],
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Google Places",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Places": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}
